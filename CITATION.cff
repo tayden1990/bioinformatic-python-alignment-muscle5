@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: "Saeed"
+    given-names: "Taher Akbari"
+    orcid: "https://orcid.org/0000-0000-0000-0000" # Replace with actual ORCID if available
+title: "Muscle5 Sequence Alignment Tool"
+version: 1.0.0
+date-released: 2023-03-28
+url: "https://github.com/tayden1990/bioinformatic-python-alignment-muscle5"
+repository-code: "https://github.com/tayden1990/bioinformatic-python-alignment-muscle5"
+license: MIT
+type: software
+description: "A Python interface for MUSCLE5 with visualization and conservation analysis"
+keywords:
+  - bioinformatics
+  - sequence-alignment
+  - dna-analysis
+  - muscle5
+  - visualization
+contact:
+  - email: "taherakbarisaeed@gmail.com"
+    name: "Taher Akbari Saeed"
