@@ -220,7 +220,7 @@ docker run -p 7860:7860 muscle5-app
 If you use this tool in your research, please cite:
 
 ```
-Saeed, T. A. (2023). Muscle5 Sequence Alignment Tool: A Python interface for MUSCLE5 with 
+AkbariSaeed, T. (2023). Muscle5 Sequence Alignment Tool: A Python interface for MUSCLE5 with 
 visualization and conservation analysis. GitHub: https://github.com/tayden1990/bioinformatic-python-alignment-muscle5
 ```
 
