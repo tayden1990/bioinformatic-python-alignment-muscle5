@@ -30,6 +30,35 @@ python setup_muscle.py --force && python launch.py
 
 3. Make sure to open the application in a browser tab, not just in the preview pane.
 
+## MUSCLE Setup Issues
+
+If you encounter errors with MUSCLE installation:
+
+1. Manual installation in Codespaces:
+
+```bash
+# Download MUSCLE directly
+wget https://drive5.com/muscle/muscle_linux_intel64.tar.gz
+tar -xvzf muscle_linux_intel64.tar.gz
+chmod +x muscle
+
+# Set up the configuration
+echo "$(pwd)/muscle" > muscle_config.txt
+
+# Launch the application
+python launch.py
+```
+
+2. Alternatively, you can install MUSCLE using the Ubuntu package manager:
+
+```bash
+sudo apt-get update && sudo apt-get install -y muscle
+echo "$(which muscle)" > muscle_config.txt
+python launch.py
+```
+
+Remember that in Codespaces, any files you create will be retained between sessions as long as the Codespace remains active.
+
 ## Using the Application
 
 1. Upload a FASTA file with DNA sequences
