@@ -4,25 +4,43 @@ A Python-based graphical interface for the MUSCLE5 multiple sequence alignment a
 
 ## Screenshots
 
+<div align="center">
+  <table>
+    <tr>
+      <td><img src="screenshots/app_screenshot.png" alt="Main Interface" width="400"/></td>
+      <td><img src="screenshots/dna_visualization.png" alt="DNA Visualization" width="400"/></td>
+    </tr>
+    <tr>
+      <td align="center"><b>Main Interface</b></td>
+      <td align="center"><b>DNA Visualization</b></td>
+    </tr>
+    <tr>
+      <td><img src="screenshots/conservation_analysis.png" alt="Conservation Analysis" width="400"/></td>
+      <td><img src="screenshots/screenshot_2025_03_29_161345.png" alt="Results View" width="400"/></td>
+    </tr>
+    <tr>
+      <td align="center"><b>Conservation Analysis</b></td>
+      <td align="center"><b>Results View</b></td>
+    </tr>
+  </table>
+</div>
+
 <details>
-<summary>Click to expand screenshots gallery</summary>
-
-### Main Interface
-![Muscle5 Tool Main Interface](screenshots/app_screenshot.png)
-
-### DNA Visualization
-![DNA Sequence Visualization](screenshots/dna_visualization.png)
-
-### Conservation Analysis
-![Conservation Analysis](screenshots/conservation_analysis.png)
-
-### Environment Setup
-![Windows Setup](screenshots/windows_setup.png)
-![Mac Setup](screenshots/mac_setup.png)
-![Linux Setup](screenshots/linux_setup.png)
-
-For more screenshots, check the [screenshots directory](screenshots/).
-
+<summary>Additional environment setup screenshots</summary>
+<div align="center">
+  <table>
+    <tr>
+      <td><img src="screenshots/windows_setup.png" alt="Windows Setup" width="280"/></td>
+      <td><img src="screenshots/mac_setup.png" alt="Mac Setup" width="280"/></td>
+      <td><img src="screenshots/linux_setup.png" alt="Linux Setup" width="280"/></td>
+    </tr>
+    <tr>
+      <td align="center"><b>Windows Setup</b></td>
+      <td align="center"><b>Mac Setup</b></td>
+      <td align="center"><b>Linux Setup</b></td>
+    </tr>
+  </table>
+</div>
 </details>
 
 ## Features
