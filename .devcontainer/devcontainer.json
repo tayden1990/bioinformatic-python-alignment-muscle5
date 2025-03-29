@@ -6,13 +6,13 @@
             "version": "3.9"
         }
     },
-    "postCreateCommand": "pip install -r requirements.txt && chmod +x *.py",
-    "postStartCommand": "echo '🧬 MUSCLE5 Alignment Tool is ready. Run: python codespaces_start.py'",
+    "postCreateCommand": "pip install -r requirements.txt && python setup_muscle.py",
+    "postStartCommand": "echo '🧬 MUSCLE5 Alignment Tool is ready. Run: python launch.py'",
     "forwardPorts": [7860],
     "portsAttributes": {
         "7860": {
             "label": "MUSCLE5 Web Interface",
-            "onAutoForward": "openPreview"
+            "onAutoForward": "openBrowser"
         }
     },
     "customizations": {

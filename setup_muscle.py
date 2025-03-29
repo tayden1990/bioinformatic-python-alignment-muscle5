@@ -1,201 +1,167 @@
 #!/usr/bin/env python3
 """
 MUSCLE5 Setup Script
-This script automates the download and setup of the MUSCLE5 executable
-for different operating systems.
+Downloads and configures MUSCLE5 executable for this application
+Works in both local and Codespaces environments
 """
 
 import os
 import sys
 import platform
 import subprocess
-import shutil
-import argparse
-from pathlib import Path
+import tempfile
 import urllib.request
-import locale
+import shutil
+import zipfile
+import stat
+from pathlib import Path
 
-# MUSCLE5 download URLs
-MUSCLE_URLS = {
-    "Windows": "https://github.com/rcedgar/muscle/releases/download/v5.3/muscle-win64.v5.3.exe",
-    "Darwin": "https://github.com/rcedgar/muscle/releases/download/v5.3/muscle-osx-x86.v5.3",
-    "Linux": "https://github.com/rcedgar/muscle/releases/download/v5.3/muscle-linux-x86.v5.3"
-}
+def print_step(message):
+    """Print a step in the setup process"""
+    print(f"\n[SETUP] {message}")
 
-# Check if terminal supports Unicode - improved version
-def supports_unicode():
-    """Check if the terminal supports Unicode characters."""
-    # Assume CI environments don't support Unicode
-    if "CI" in os.environ or os.environ.get("GITHUB_ACTIONS") == "true":
-        return False
-        
+def is_codespaces():
+    """Check if running in GitHub Codespaces environment"""
+    return "CODESPACES" in os.environ or "CODESPACE_NAME" in os.environ
+
+def download_file(url, output_path):
+    """Download a file from URL to output path with progress"""
+    print(f"Downloading from {url} to {output_path}")
     try:
-        # Try to encode a Unicode character
-        "✅".encode(sys.stdout.encoding)
+        with urllib.request.urlopen(url) as response, open(output_path, 'wb') as out_file:
+            total_size = int(response.info().get('Content-Length', 0))
+            downloaded = 0
+            block_size = 8192
+            
+            while True:
+                buffer = response.read(block_size)
+                if not buffer:
+                    break
+                    
+                downloaded += len(buffer)
+                out_file.write(buffer)
+                
+                # Simple progress indicator
+                progress = int(50 * downloaded / total_size) if total_size > 0 else 0
+                sys.stdout.write(f"\r[{'#' * progress}{' ' * (50-progress)}] {downloaded/1024/1024:.1f}MB")
+                sys.stdout.flush()
+                
+        print("\nDownload completed successfully.")
         return True
-    except (UnicodeEncodeError, AttributeError):
+    except Exception as e:
+        print(f"Error downloading file: {e}")
         return False
 
-# Set up symbols based on terminal support
-CHECK_MARK = "[SUCCESS]" 
-CROSS_MARK = "[FAILED]"
-SPARKLES = "***"
+def make_executable(path):
+    """Make a file executable"""
+    current_mode = os.stat(path).st_mode
+    os.chmod(path, current_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
-def get_system_info():
-    """Detect the operating system and architecture."""
-    system = platform.system()
-    architecture = platform.machine()
+def get_muscle5_download_url():
+    """Get the appropriate MUSCLE5 download URL for the current platform"""
+    system = platform.system().lower()
+    machine = platform.machine().lower()
     
-    print(f"Detected system: {system} ({architecture})")
-    
-    if system not in MUSCLE_URLS:
-        print(f"Error: Unsupported operating system: {system}")
-        print("MUSCLE5 is available for Windows, macOS (Darwin), and Linux")
-        return None
-    
-    return system
-
-def download_muscle(system, destination=None):
-    """Download the appropriate MUSCLE5 executable for the system."""
-    url = MUSCLE_URLS[system]
-    
-    # Default destination directory is the current script directory
-    if destination is None:
-        destination = os.path.dirname(os.path.abspath(__file__))
-    
-    # Create destination directory if it doesn't exist
-    os.makedirs(destination, exist_ok=True)
-    
-    # Set appropriate filename
-    if system == "Windows":
-        filename = "muscle5.exe"
-    else:
-        filename = "muscle5"
-    
-    file_path = os.path.join(destination, filename)
-    
-    print(f"Downloading MUSCLE5 from {url}")
-    print(f"Saving to {file_path}")
-    
-    try:
-        # Download the file
-        urllib.request.urlretrieve(url, file_path)
-        
-        # Make executable on Unix-like systems
-        if system != "Windows":
-            os.chmod(file_path, 0o755)
-        
-        print("Download completed successfully.")
-        return file_path
-    
-    except Exception as e:
-        print(f"Error downloading MUSCLE5: {e}")
-        return None
-
-def verify_installation(file_path):
-    """Verify that the downloaded MUSCLE5 executable works."""
-    print("Verifying MUSCLE5 installation...")
-    
-    try:
-        # Try running with -version to see if it's actually MUSCLE
-        result = subprocess.run(
-            [file_path, "-version"], 
-            capture_output=True, 
-            text=True,
-            check=False,
-            timeout=5  # Add a timeout to avoid hanging
-        )
-        
-        # Check if the output contains MUSCLE
-        output = result.stdout + result.stderr
-        if "MUSCLE" in output or "muscle" in output:
-            print(f"{CHECK_MARK} MUSCLE5 installation verified!")
-            print(f"Version information: {output.strip()}")
-            return True
+    if system == "windows":
+        return "https://drive5.com/muscle5/muscle5.1.win64.exe", "muscle5.exe"
+    elif system == "darwin":  # macOS
+        if "arm" in machine or "aarch64" in machine:
+            return "https://drive5.com/muscle5/muscle5.1.macos_arm64", "muscle5"
         else:
-            print(f"{CROSS_MARK} Verification failed: The executable doesn't appear to be MUSCLE5")
-            print(f"Output: {output}")
-            return False
-    
-    except Exception as e:
-        print(f"{CROSS_MARK} Verification failed: {e}")
-        return False
-
-def configure_environment(file_path):
-    """Configure the environment to use the MUSCLE5 executable."""
-    abs_path = os.path.abspath(file_path)
-    
-    # Save the path to the configuration file
-    config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "muscle_config.txt")
-    try:
-        with open(config_path, "w") as f:
-            f.write(abs_path)
-        print(f"Saved MUSCLE5 path to configuration file: {config_path}")
-    except Exception as e:
-        print(f"Warning: Failed to save configuration file: {e}")
-    
-    # Suggest setting environment variable
-    if platform.system() == "Windows":
-        print("\nTo set the environment variable permanently, run this in Command Prompt:")
-        print(f'setx MUSCLE5_PATH "{abs_path}"')
-    else:
-        print("\nTo set the environment variable permanently, add this to your shell profile (~/.bashrc, ~/.zshrc, etc.):")
-        print(f'export MUSCLE5_PATH="{abs_path}"')
-    
-    # Set for current process
-    os.environ["MUSCLE5_PATH"] = abs_path
-    print(f"\nMUSCLE5_PATH is now set to: {abs_path}")
-    print("This will work for this session, but you should set it permanently as suggested above.")
-
-def main():
-    parser = argparse.ArgumentParser(description="Setup MUSCLE5 executable for sequence alignment")
-    parser.add_argument("--destination", help="Destination directory for the MUSCLE5 executable", default=None)
-    parser.add_argument("--force", action="store_true", help="Force download even if executable already exists")
-    args = parser.parse_args()
-    
-    # Detect the operating system
-    system = get_system_info()
-    if not system:
-        return 1
-    
-    destination = args.destination
-    
-    # Determine the expected file path
-    if destination is None:
-        destination = os.path.dirname(os.path.abspath(__file__))
-    
-    filename = "muscle5.exe" if system == "Windows" else "muscle5"
-    file_path = os.path.join(destination, filename)
-    
-    # Check if the executable already exists
-    if os.path.exists(file_path) and not args.force:
-        print(f"MUSCLE5 executable already exists at {file_path}")
-        print("To download again, use the --force option")
-        
-        # Verify the existing executable
-        if verify_installation(file_path):
-            configure_environment(file_path)
-            return 0
+            return "https://drive5.com/muscle5/muscle5.1.macos_intel64", "muscle5"
+    elif system == "linux":
+        if "aarch64" in machine or "arm" in machine:
+            return "https://drive5.com/muscle5/muscle5.1.linux_arm64", "muscle5"
         else:
-            print("Existing executable failed verification. Consider using --force to download again.")
-            return 1
+            return "https://drive5.com/muscle5/muscle5.1.linux_intel64", "muscle5"
+    else:
+        raise RuntimeError(f"Unsupported platform: {system} {machine}")
+
+def setup_muscle5(force=False):
+    """Set up MUSCLE5 executable"""
+    print_step("Setting up MUSCLE5 executable")
+    
+    # Define the target directory
+    if is_codespaces():
+        # In Codespaces, store in workspace
+        target_dir = os.path.abspath("bin")
+    else:
+        # Locally, use a user-specific location
+        target_dir = os.path.join(os.path.expanduser("~"), ".muscle5")
+    
+    # Create directory if it doesn't exist
+    os.makedirs(target_dir, exist_ok=True)
+    
+    # Check if already configured
+    config_path = os.path.abspath("muscle_config.txt")
+    if os.path.exists(config_path) and not force:
+        with open(config_path, "r") as f:
+            muscle_path = f.read().strip()
+            if os.path.exists(muscle_path):
+                print(f"MUSCLE5 already configured at: {muscle_path}")
+                return muscle_path
+    
+    # Get platform-specific download URL and executable name
+    try:
+        url, exe_name = get_muscle5_download_url()
+    except RuntimeError as e:
+        print(f"Error: {e}")
+        print("You'll need to manually download MUSCLE5 for your platform from: https://drive5.com/muscle5/")
+        return None
     
     # Download MUSCLE5
-    file_path = download_muscle(system, destination)
-    if not file_path:
-        return 1
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        download_path = os.path.join(tmp_dir, exe_name)
+        
+        if download_file(url, download_path):
+            # Make executable if needed (for Unix)
+            if platform.system() != "Windows":
+                make_executable(download_path)
+            
+            # Move to target directory
+            target_path = os.path.join(target_dir, exe_name)
+            shutil.move(download_path, target_path)
+            
+            # Make executable again after moving (just to be sure)
+            if platform.system() != "Windows":
+                make_executable(target_path)
+            
+            # Save the path to config file
+            with open(config_path, "w") as f:
+                f.write(target_path)
+            
+            print(f"MUSCLE5 installed at: {target_path}")
+            return target_path
     
-    # Verify the installation
-    if not verify_installation(file_path):
-        return 1
+    return None
+
+def main():
+    """Main function"""
+    import argparse
     
-    # Configure the environment
-    configure_environment(file_path)
+    parser = argparse.ArgumentParser(description="Set up MUSCLE5 for the alignment tool")
+    parser.add_argument("--force", action="store_true", help="Force re-download even if already configured")
+    args = parser.parse_args()
     
-    print(f"\n{SPARKLES} MUSCLE5 setup completed successfully! {SPARKLES}")
-    print(f"You can now run the alignment tool: python app.py")
+    muscle_path = setup_muscle5(force=args.force)
     
-    return 0
+    if muscle_path:
+        print("\n✅ MUSCLE5 setup completed successfully!")
+        
+        # Test MUSCLE5
+        try:
+            if platform.system() == "Windows":
+                result = subprocess.run([muscle_path, "-version"], capture_output=True, text=True)
+            else:
+                result = subprocess.run([muscle_path, "-version"], capture_output=True, text=True)
+                
+            print(f"\nMUSCLE5 version information:")
+            print(result.stdout.strip())
+        except Exception as e:
+            print(f"\nWarning: Could not verify MUSCLE5 installation: {e}")
+    else:
+        print("\n❌ MUSCLE5 setup failed. Please try again or install manually.")
+        sys.exit(1)
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
