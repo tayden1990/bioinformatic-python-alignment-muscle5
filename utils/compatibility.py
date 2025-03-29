@@ -28,6 +28,14 @@ def is_codespaces():
     """Check if running in GitHub Codespaces environment"""
     return "CODESPACES" in os.environ or "CODESPACE_NAME" in os.environ
 
+def is_key_in_dict(d, key):
+    """Safely check if a key is in a dictionary, handling non-dict types"""
+    try:
+        return key in d
+    except TypeError:
+        # If d is not iterable or not a dictionary
+        return False
+
 def launch_app(app, **kwargs):
     """
     Launch the Gradio app with the appropriate parameters for the environment
@@ -49,20 +57,51 @@ def launch_app(app, **kwargs):
         logger.info("Running in GitHub Codespaces environment")
         kwargs['server_name'] = kwargs.get('server_name', '0.0.0.0')
         
-        # In Codespaces, we need to use specific settings to avoid the bool iterable error
-        if GRADIO_VERSION and GRADIO_VERSION >= "3.40.0":
-            logger.info("Using Codespaces-compatible launch settings for Gradio >= 3.40.0")
+        # In Codespaces, we need to use specific settings for Gradio 4.x+
+        if GRADIO_VERSION and GRADIO_VERSION.startswith("4."):
+            logger.info("Using Codespaces-compatible launch settings for Gradio 4.x")
+            
+            # Remove any parameters that might not be supported in Gradio 4.x
+            if 'prevent_thread_lock' in kwargs:
+                del kwargs['prevent_thread_lock']
+            if 'show_error' in kwargs:
+                del kwargs['show_error']
+                
             try:
-                # Try launching with the workaround for newer Gradio versions
+                # Basic launch for Gradio 4.x
+                result = app.launch(**kwargs)
+                # Safely try to log the share URL if available
+                try:
+                    if hasattr(result, 'share_url') and result.share_url:
+                        logger.info("----------------------------------------")
+                        logger.info("🌎 Public URL: %s", result.share_url)
+                        logger.info("----------------------------------------")
+                except AttributeError:
+                    # If we can't access share_url attribute, don't crash
+                    pass
+                return result
+            except Exception as e:
+                logger.warning(f"Launch failed with error: {str(e)}")
+                # Try a simpler approach
+                return app.launch(server_name='0.0.0.0', share=True)
+        else:
+            # For Gradio 3.x
+            logger.info("Using Codespaces-compatible launch settings for Gradio 3.x")
+            try:
+                # Try launching with compatible settings for older Gradio
                 result = app.launch(
                     show_error=True,
                     prevent_thread_lock=True,
                     **kwargs
                 )
                 if kwargs['share']:
-                    logger.info("----------------------------------------")
-                    logger.info("🌎 Public URL: %s", result.share_url)
-                    logger.info("----------------------------------------")
+                    try:
+                        if hasattr(result, 'share_url') and result.share_url:
+                            logger.info("----------------------------------------")
+                            logger.info("🌎 Public URL: %s", result.share_url)
+                            logger.info("----------------------------------------")
+                    except AttributeError:
+                        pass
                 return result
             except TypeError as e:
                 if "not iterable" in str(e):
@@ -70,15 +109,21 @@ def launch_app(app, **kwargs):
                     # If we get the 'not iterable' error, try a simpler launch approach
                     return app.launch(quiet=True, **kwargs)
                 raise
-        else:
-            # Older Gradio versions don't have the issue
-            return app.launch(**kwargs)
     else:
         # For local environment, use standard launch but still with share=True by default
         logger.info("Running in local environment")
-        result = app.launch(**kwargs)
-        if kwargs['share']:
-            logger.info("----------------------------------------")
-            logger.info("🌎 Public URL: %s", result.share_url)
-            logger.info("----------------------------------------")
-        return result
+        try:
+            result = app.launch(**kwargs)
+            if kwargs['share']:
+                try:
+                    if hasattr(result, 'share_url') and result.share_url:
+                        logger.info("----------------------------------------")
+                        logger.info("🌎 Public URL: %s", result.share_url)
+                        logger.info("----------------------------------------")
+                except AttributeError:
+                    pass
+            return result
+        except Exception as e:
+            logger.warning(f"Standard launch failed with: {str(e)}")
+            # Fallback to simplest launch
+            return app.launch(server_name='0.0.0.0', share=True)
