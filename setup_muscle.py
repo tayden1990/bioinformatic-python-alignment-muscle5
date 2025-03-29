@@ -28,28 +28,42 @@ def download_file(url, output_path):
     """Download a file from URL to output path with progress"""
     try:
         print(f"Downloading from {url} to {output_path}")
-        with urllib.request.urlopen(url) as response, open(output_path, 'wb') as out_file:
-            file_size = int(response.info().get('Content-Length', 0))
+        
+        # Create a request with a user agent to avoid 403 errors
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        req = urllib.request.Request(url, headers=headers)
+        
+        with urllib.request.urlopen(req) as response, open(output_path, 'wb') as out_file:
+            total_size = int(response.info().get('Content-Length', 0))
             downloaded = 0
-            block_size = 8192
+            chunk_size = 1024 * 1024  # 1MB chunks
             
             while True:
-                buffer = response.read(block_size)
-                if not buffer:
+                chunk = response.read(chunk_size)
+                if not chunk:
                     break
-                downloaded += len(buffer)
-                out_file.write(buffer)
+                downloaded += len(chunk)
+                out_file.write(chunk)
                 
-                # Calculate progress
-                if file_size > 0:
-                    percent = int(downloaded * 100 / file_size)
-                    sys.stdout.write(f"\rProgress: {percent}% ({downloaded} / {file_size} bytes)")
+                # Print progress
+                if total_size > 0:
+                    percent = int(downloaded * 100 / total_size)
+                    sys.stdout.write(f"\rDownloading... {percent}% ({downloaded} / {total_size} bytes)")
+                    sys.stdout.flush()
+                else:
+                    sys.stdout.write(f"\rDownloading... {downloaded} bytes")
                     sys.stdout.flush()
             
             print()  # New line after progress
-        return True
+            return True
     except urllib.error.HTTPError as e:
         print(f"Error downloading file: {e}")
+        # Check if we need to provide specific advice based on the error
+        if e.code == 403:
+            print("Access forbidden. The server may be blocking automated downloads.")
+            print("Please try manual download from the website.")
         return False
     except Exception as e:
         print(f"Unexpected error during download: {e}")
@@ -65,21 +79,21 @@ def get_muscle5_download_url():
     system = platform.system().lower()
     machine = platform.machine().lower()
     
-    # Updated URLs for MUSCLE5 - now using the main muscle website
-    base_url = "https://drive5.com/muscle/"
+    # Updated URLs for MUSCLE5 - now using the updated muscle website URLs
+    base_url = "https://drive5.com/muscle5/"
     
     if system == "windows":
-        return f"{base_url}muscle_win64.tar.gz", "muscle.exe"
+        return f"{base_url}muscle5.1.win64.exe", "muscle5.exe"
     elif system == "darwin":  # macOS
         if "arm" in machine or "aarch64" in machine:
-            return f"{base_url}muscle_macos_arm64.tar.gz", "muscle"
+            return f"{base_url}muscle5.1.macos_arm64", "muscle5"
         else:
-            return f"{base_url}muscle_macos_intel64.tar.gz", "muscle"
+            return f"{base_url}muscle5.1.macos_intel64", "muscle5"
     elif system == "linux":
         if "aarch64" in machine or "arm" in machine:
-            return f"{base_url}muscle_linux_arm64.tar.gz", "muscle"
+            return f"{base_url}muscle5.1.linux_arm64", "muscle5"
         else:
-            return f"{base_url}muscle_linux_intel64.tar.gz", "muscle"
+            return f"{base_url}muscle5.1.linux_intel64", "muscle5"
     else:
         raise RuntimeError(f"Unsupported platform: {system} {machine}")
 
@@ -129,6 +143,7 @@ def setup_muscle5(force=False):
     # Get platform-specific download URL and executable name
     try:
         url, exe_name = get_muscle5_download_url()
+        print(f"Will download from: {url}")
     except RuntimeError as e:
         print(f"Error: {e}")
         print_manual_instructions()
@@ -136,22 +151,27 @@ def setup_muscle5(force=False):
     
     # Download MUSCLE5
     with tempfile.TemporaryDirectory() as tmp_dir:
-        download_path = os.path.join(tmp_dir, "muscle.tar.gz")
+        download_path = os.path.join(tmp_dir, exe_name)
         extract_dir = os.path.join(tmp_dir, "extracted")
         os.makedirs(extract_dir, exist_ok=True)
         
         if download_file(url, download_path):
-            # Extract the tar.gz file
-            if not extract_tar_gz(download_path, extract_dir):
-                print_manual_instructions()
-                return None
-            
-            # Find the muscle executable in the extracted files
-            muscle_path = find_muscle_executable(extract_dir)
-            if not muscle_path:
-                print("Could not find MUSCLE executable in the extracted files.")
-                print_manual_instructions()
-                return None
+            # Check if the downloaded file is already an executable (not an archive)
+            if not url.endswith('.tar.gz'):
+                # It's a direct executable, no need to extract
+                muscle_path = download_path
+            else:
+                # Extract the tar.gz file
+                if not extract_tar_gz(download_path, extract_dir):
+                    print_manual_instructions()
+                    return None
+                
+                # Find the muscle executable in the extracted files
+                muscle_path = find_muscle_executable(extract_dir)
+                if not muscle_path:
+                    print("Could not find MUSCLE executable in the extracted files.")
+                    print_manual_instructions()
+                    return None
             
             # Make executable if needed (for Unix)
             if platform.system() != "Windows":
@@ -180,10 +200,10 @@ def print_manual_instructions():
     """Print instructions for manual download of MUSCLE"""
     print("\n== MANUAL DOWNLOAD INSTRUCTIONS ==")
     print("The automatic download failed. Please follow these steps to manually install MUSCLE:")
-    print("1. Visit the official MUSCLE website: https://drive5.com/muscle/")
+    print("1. Visit the official MUSCLE website: https://drive5.com/muscle5/")
     print("2. Download the appropriate version for your operating system")
-    print("3. Extract the archive and locate the muscle executable")
-    print("4. Make the file executable (chmod +x muscle) on Mac/Linux")
+    print("3. Save the executable file to a location on your computer")
+    print("4. Make the file executable (chmod +x muscle5) on Mac/Linux")
     print("5. Update the muscle_config.txt file with the full path to the executable")
     print("\nAlternatively, you can download a pre-compiled binary from other sources:")
     print("- Bioconda: https://anaconda.org/bioconda/muscle")

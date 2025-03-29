@@ -111,7 +111,7 @@ MUSCLE5 represents a significant advancement over previous alignment algorithms 
 ### Prerequisites
 
 - Python 3.8+ 
-- MUSCLE5 executable ([available here](https://drive5.com/muscle/))
+- MUSCLE5 executable ([available here](https://drive5.com/muscle5/))
 
 ### Setup
 
@@ -129,21 +129,21 @@ pip install -r requirements.txt
 3. Download and install MUSCLE5:
 
    **For Windows:**
-   - Download from [drive5.com/muscle](https://drive5.com/muscle/)
+   - Download from [drive5.com/muscle5](https://drive5.com/muscle5/)
    - Choose the Windows executable (muscle5.1.win64.exe)
    - Save it to a location on your computer (e.g., `C:\Program Files\muscle5\`)
-   - Rename the file to `muscle5.exe` for convenience
+   - Rename the file to `muscle5.exe` for convenience (optional)
    - Add the folder to your PATH environment variable or provide the full path in the configuration
 
    **For Mac:**
-   - Download from [drive5.com/muscle](https://drive5.com/muscle/)
-   - Choose the Mac executable (muscle5.1.macos_intel64)
+   - Download from [drive5.com/muscle5](https://drive5.com/muscle5/)
+   - Choose the Mac executable (muscle5.1.macos_intel64 or muscle5.1.macos_arm64)
    - Save it to a location on your computer (e.g., `/usr/local/bin/`)
    - Make it executable: `chmod +x /usr/local/bin/muscle5.1.macos_intel64`
    - Create a symlink: `ln -s /usr/local/bin/muscle5.1.macos_intel64 /usr/local/bin/muscle5`
 
    **For Linux:**
-   - Download from [drive5.com/muscle](https://drive5.com/muscle/)
+   - Download from [drive5.com/muscle5](https://drive5.com/muscle5/)
    - Choose the Linux executable (muscle5.1.linux_intel64)
    - Save it to a location on your computer (e.g., `/usr/local/bin/`)
    - Make it executable: `chmod +x /usr/local/bin/muscle5.1.linux_intel64`
