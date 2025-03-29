@@ -7,24 +7,24 @@ A Python-based graphical interface for the MUSCLE5 multiple sequence alignment a
 <div align="center">
   <table>
     <tr>
-      <td><img src="screenshots/screenshot_2025_03_29_161345.png" alt="Main Interface" width="400"/></td>
-      <td><img src="screenshots/screenshot_2025_03_29_161430.png" alt="Alignment Options" width="400"/></td>
+      <td><img src="screenshots/screenshot_2025_03_29_161345.png" alt="Main Page Interface" width="400"/></td>
+      <td><img src="screenshots/screenshot_2025_03_29_161430.png" alt="Alignment Options Interface" width="400"/></td>
     </tr>
     <tr>
-      <td align="center"><b>Main Interface</b></td>
+      <td align="center"><b>Main Page Interface</b></td>
       <td align="center"><b>Alignment Options</b></td>
     </tr>
     <tr>
-      <td><img src="screenshots/screenshot_2025_03_29_161504.png" alt="Alignment Results" width="400"/></td>
-      <td><img src="screenshots/screenshot_2025_03_29_161516.png" alt="DNA Visualization" width="400"/></td>
+      <td><img src="screenshots/screenshot_2025_03_29_161504.png" alt="Alignment Results View" width="400"/></td>
+      <td><img src="screenshots/screenshot_2025_03_29_161516.png" alt="DNA Visualization View" width="400"/></td>
     </tr>
     <tr>
       <td align="center"><b>Alignment Results</b></td>
       <td align="center"><b>DNA Visualization</b></td>
     </tr>
     <tr>
-      <td><img src="screenshots/screenshot_2025_03_29_161728.png" alt="Conservation Analysis" width="400"/></td>
-      <td><img src="screenshots/screenshot_2025_03_29_161801.png" alt="Export Options" width="400"/></td>
+      <td><img src="screenshots/screenshot_2025_03_29_161728.png" alt="Conservation Analysis View" width="400"/></td>
+      <td><img src="screenshots/screenshot_2025_03_29_161801.png" alt="Export Options Interface" width="400"/></td>
     </tr>
     <tr>
       <td align="center"><b>Conservation Analysis</b></td>
@@ -38,9 +38,9 @@ A Python-based graphical interface for the MUSCLE5 multiple sequence alignment a
 <div align="center">
   <table>
     <tr>
-      <td><img src="screenshots/windows_setup.png" alt="Windows Setup" width="280"/></td>
-      <td><img src="screenshots/mac_setup.png" alt="Mac Setup" width="280"/></td>
-      <td><img src="screenshots/linux_setup.png" alt="Linux Setup" width="280"/></td>
+      <td><img src="screenshots/windows_setup.png" alt="Windows Setup Instructions" width="280"/></td>
+      <td><img src="screenshots/mac_setup.png" alt="macOS Setup Instructions" width="280"/></td>
+      <td><img src="screenshots/linux_setup.png" alt="Linux Setup Instructions" width="280"/></td>
     </tr>
     <tr>
       <td align="center"><b>Windows Setup</b></td>
