@@ -14,6 +14,13 @@ from Bio.Align import MultipleSeqAlignment
 from datetime import datetime
 import re
 import platform
+# Import our compatibility utilities if available
+try:
+    from utils.compatibility import is_codespaces
+except ImportError:
+    # Define a fallback if the module isn't available
+    def is_codespaces():
+        return "CODESPACES" in os.environ or "CODESPACE_NAME" in os.environ
 
 # Better path handling for MUSCLE5
 def get_default_muscle_path():
@@ -1013,12 +1020,33 @@ if __name__ == "__main__":
     
     app = create_ui()
     
-    # Check if running in GitHub Codespaces
-    codespaces_url = os.environ.get("CODESPACES", "")
-    if codespaces_url:
-        # GitHub Codespaces requires public=True and needs the host to be 0.0.0.0
-        print(f"Running in GitHub Codespaces environment")
-        app.launch(server_name="0.0.0.0", share=True)
-    else:
-        # Standard local launch
-        app.launch(share=False)
+    # Try to use the compatibility module if available
+    try:
+        from utils.compatibility import launch_app
+        launch_app(app)
+    except ImportError:
+        # Fall back to the original code if compatibility module isn't available
+        codespaces_env = is_codespaces()
+        if codespaces_env:
+            # GitHub Codespaces requires public=True and needs the host to be 0.0.0.0
+            print(f"Running in GitHub Codespaces environment")
+            try:
+                result = app.launch(server_name="0.0.0.0", share=True, prevent_thread_lock=True)
+                if hasattr(result, 'share_url') and result.share_url:
+                    print("\n" + "=" * 60)
+                    print(f"🌎 PUBLIC SHARING URL: {result.share_url}")
+                    print("=" * 60 + "\n")
+            except TypeError:
+                # Fallback for older Gradio versions or if there's a parameter issue
+                result = app.launch(server_name="0.0.0.0", share=True)
+                if hasattr(result, 'share_url') and result.share_url:
+                    print("\n" + "=" * 60)
+                    print(f"🌎 PUBLIC SHARING URL: {result.share_url}")
+                    print("=" * 60 + "\n")
+        else:
+            # Standard local launch
+            result = app.launch(share=True)
+            if hasattr(result, 'share_url') and result.share_url:
+                print("\n" + "=" * 60)
+                print(f"🌎 PUBLIC SHARING URL: {result.share_url}")
+                print("=" * 60 + "\n")

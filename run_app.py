@@ -67,7 +67,13 @@ def main():
     
     # Create and start the Gradio interface
     app = create_ui()
-    app.launch(share=True, inbrowser=False)
+    result = app.launch(share=True, inbrowser=False)
+    
+    # Display the public URL prominently
+    if hasattr(result, 'share_url') and result.share_url:
+        print("\n" + "=" * 60)
+        print(f"🌎 PUBLIC SHARING URL: {result.share_url}")
+        print("=" * 60 + "\n")
 
 if __name__ == "__main__":
     main()
