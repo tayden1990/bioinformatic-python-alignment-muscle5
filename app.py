@@ -14,13 +14,36 @@ from Bio.Align import MultipleSeqAlignment
 from datetime import datetime
 import re
 import platform
+
 # Import our compatibility utilities if available
 try:
-    from utils.compatibility import is_codespaces
+    from utils.compatibility import is_codespaces, has_pyobjc, is_compatible_python_version
 except ImportError:
-    # Define a fallback if the module isn't available
+    # Define fallback if the module isn't available
     def is_codespaces():
         return "CODESPACES" in os.environ or "CODESPACE_NAME" in os.environ
+    
+    def has_pyobjc():
+        try:
+            import pyobjc_framework_Cocoa
+            return True
+        except ImportError:
+            return False
+    
+    def is_compatible_python_version():
+        major = sys.version_info.major
+        minor = sys.version_info.minor
+        if sys.platform == "darwin" and (major, minor) < (3, 9):
+            return False
+        return True
+
+# Check Python compatibility and warn if needed
+if not is_compatible_python_version():
+    print("\n" + "!" * 80)
+    print(f"WARNING: Running on Python {sys.version_info.major}.{sys.version_info.minor} on macOS.")
+    print("Some functionality requiring PyObjC (which needs Python 3.9+) will be limited.")
+    print("For best experience, consider upgrading to Python 3.9 or higher.")
+    print("!" * 80 + "\n")
 
 # Better path handling for MUSCLE5
 def get_default_muscle_path():

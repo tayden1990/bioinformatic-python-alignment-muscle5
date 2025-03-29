@@ -13,6 +13,7 @@ import shutil
 import argparse
 from pathlib import Path
 import urllib.request
+import locale
 
 # MUSCLE5 download URLs
 MUSCLE_URLS = {
@@ -20,6 +21,25 @@ MUSCLE_URLS = {
     "Darwin": "https://github.com/rcedgar/muscle/releases/download/v5.3/muscle-osx-x86.v5.3",
     "Linux": "https://github.com/rcedgar/muscle/releases/download/v5.3/muscle-linux-x86.v5.3"
 }
+
+# Check if terminal supports Unicode - improved version
+def supports_unicode():
+    """Check if the terminal supports Unicode characters."""
+    # Assume CI environments don't support Unicode
+    if "CI" in os.environ or os.environ.get("GITHUB_ACTIONS") == "true":
+        return False
+        
+    try:
+        # Try to encode a Unicode character
+        "✅".encode(sys.stdout.encoding)
+        return True
+    except (UnicodeEncodeError, AttributeError):
+        return False
+
+# Set up symbols based on terminal support
+CHECK_MARK = "[SUCCESS]" 
+CROSS_MARK = "[FAILED]"
+SPARKLES = "***"
 
 def get_system_info():
     """Detect the operating system and architecture."""
@@ -89,16 +109,16 @@ def verify_installation(file_path):
         # Check if the output contains MUSCLE
         output = result.stdout + result.stderr
         if "MUSCLE" in output or "muscle" in output:
-            print("✅ MUSCLE5 installation verified!")
+            print(f"{CHECK_MARK} MUSCLE5 installation verified!")
             print(f"Version information: {output.strip()}")
             return True
         else:
-            print("❌ Verification failed: The executable doesn't appear to be MUSCLE5")
+            print(f"{CROSS_MARK} Verification failed: The executable doesn't appear to be MUSCLE5")
             print(f"Output: {output}")
             return False
     
     except Exception as e:
-        print(f"❌ Verification failed: {e}")
+        print(f"{CROSS_MARK} Verification failed: {e}")
         return False
 
 def configure_environment(file_path):
@@ -172,7 +192,7 @@ def main():
     # Configure the environment
     configure_environment(file_path)
     
-    print("\n✨ MUSCLE5 setup completed successfully! ✨")
+    print(f"\n{SPARKLES} MUSCLE5 setup completed successfully! {SPARKLES}")
     print(f"You can now run the alignment tool: python app.py")
     
     return 0

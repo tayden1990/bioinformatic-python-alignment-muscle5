@@ -36,32 +36,56 @@ def is_key_in_dict(d, key):
         # If d is not iterable or not a dictionary
         return False
 
+def has_pyobjc():
+    """Check if PyObjC is installed and available"""
+    try:
+        import pyobjc_framework_Cocoa
+        return True
+    except ImportError:
+        return False
+
+def is_compatible_python_version():
+    """Check if the current Python version is compatible with all dependencies"""
+    major = sys.version_info.major
+    minor = sys.version_info.minor
+    
+    # PyObjC requires Python 3.9+
+    if sys.platform == "darwin" and (major, minor) < (3, 9):
+        return False
+    
+    return True
+
 def launch_app(app, **kwargs):
     """
-    Launch the Gradio app with the appropriate parameters for the environment
+    Launch a Gradio app with appropriate settings for the environment.
+    Handles different Gradio versions and environments like GitHub Codespaces.
     
     Args:
-        app: Gradio application object
+        app: The Gradio app to launch
         **kwargs: Additional arguments to pass to app.launch()
-        
+    
     Returns:
         The result of app.launch()
     """
-    # Always share the app publicly by default unless explicitly set to False
+    # Default to share=True if not specified
     if 'share' not in kwargs:
         kwargs['share'] = True
-    
-    logger.info(f"Launching app with share={kwargs['share']}")
-    
+        
+    # For GitHub Codespaces, we need specific settings
     if is_codespaces():
         logger.info("Running in GitHub Codespaces environment")
-        kwargs['server_name'] = kwargs.get('server_name', '0.0.0.0')
+        # Set server_name to 0.0.0.0 for Codespaces
+        kwargs['server_name'] = '0.0.0.0'
         
-        # In Codespaces, we need to use specific settings for Gradio 4.x+
-        if GRADIO_VERSION and GRADIO_VERSION.startswith("4."):
-            logger.info("Using Codespaces-compatible launch settings for Gradio 4.x")
-            
-            # Remove any parameters that might not be supported in Gradio 4.x
+        # Set host to 0.0.0.0 for Gradio 4.x
+        kwargs['host'] = '0.0.0.0'
+        
+        # Check which version of Gradio we're using
+        if GRADIO_VERSION and GRADIO_VERSION.startswith('4.'):
+            logger.info("Using Gradio 4.x in Codespaces")
+            # For Gradio 4.x, cleanup potentially incompatible parameters
+            if 'height' in kwargs:
+                del kwargs['height']
             if 'prevent_thread_lock' in kwargs:
                 del kwargs['prevent_thread_lock']
             if 'show_error' in kwargs:
@@ -124,6 +148,6 @@ def launch_app(app, **kwargs):
                     pass
             return result
         except Exception as e:
-            logger.warning(f"Standard launch failed with: {str(e)}")
-            # Fallback to simplest launch
-            return app.launch(server_name='0.0.0.0', share=True)
+            logger.warning(f"Standard launch failed with error: {str(e)}")
+            logger.info("Trying simplified launch approach...")
+            return app.launch(share=True, server_name='0.0.0.0')
