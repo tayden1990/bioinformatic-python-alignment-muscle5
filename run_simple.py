@@ -30,7 +30,7 @@ def main():
     
     # Import modules after banner to show something quickly
     from app import create_ui, check_and_setup_muscle
-    from utils.compatibility import launch_app, is_codespaces
+    import gradio as gr
     
     # Check and setup MUSCLE5
     check_and_setup_muscle()
@@ -38,19 +38,29 @@ def main():
     # Create the app interface
     app = create_ui()
     
-    # Launch the app using our compatibility wrapper
+    # Launch the app with simplified approach
     try:
-        launch_app(app, quiet=True)
+        print("Starting application...")
+        # Set server_name to 0.0.0.0 to ensure proper binding in Codespaces
+        result = app.launch(server_name="0.0.0.0", share=True)
+        
+        # Try to safely access share_url if it exists
+        try:
+            if hasattr(result, 'share_url') and result.share_url:
+                print("\n" + "=" * 60)
+                print(f"🌎 PUBLIC SHARING URL: {result.share_url}")
+                print("=" * 60 + "\n")
+        except:
+            # If we can't access share_url attribute, just continue silently
+            pass
+            
     except Exception as e:
         print(f"Error launching application: {str(e)}")
         print("\nTrying alternative launch method...")
         
-        # Alternative launch method as fallback
+        # Simplest possible approach as final fallback
         try:
-            if is_codespaces():
-                app.launch(server_name="0.0.0.0", share=True, quiet=True)
-            else:
-                app.launch(share=False)
+            app.launch(server_name="0.0.0.0", share=True, prevent_thread_lock=True)
         except Exception as e2:
             print(f"Failed to launch application: {str(e2)}")
             sys.exit(1)
