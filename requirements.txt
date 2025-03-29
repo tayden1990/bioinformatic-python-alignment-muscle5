@@ -26,7 +26,7 @@ flake8>=6.0.0; extra == 'dev'            # Code linting
 pre-commit>=3.0.0; extra == 'dev'        # Git hooks for code quality
 
 # Auto GitHub Codespaces detection and compatibility
-gradio==3.50.2; environ.get('CODESPACES', '') != '' and environ.get('GRADIO_ANALYTICS_ENABLED', '')  # Pin version for Codespaces
+gradio==3.50.2; env.get('CODESPACES', '') != ''      # Pin version for Codespaces
 
 # Installation optimization flags
 # Use pip install -r requirements.txt --no-cache-dir --upgrade --use-pep517
