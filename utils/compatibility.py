@@ -26,7 +26,7 @@ logger.info(f"Detected Gradio version: {GRADIO_VERSION}")
 
 def is_codespaces():
     """Check if running in GitHub Codespaces environment"""
-    return "CODESPACES" in os.environ or "CODESPACE_NAME" in os.environ
+    return "CODESPACES" in os.environ or "CODESPACE_NAME" in os.environ or "MUSCLE5_CODESPACES_MODE" in os.environ
 
 def is_key_in_dict(d, key):
     """Safely check if a key is in a dictionary, handling non-dict types"""
@@ -77,36 +77,47 @@ def launch_app(app, **kwargs):
         # Set server_name to 0.0.0.0 for Codespaces
         kwargs['server_name'] = '0.0.0.0'
         
+        # Remove any problematic parameters
+        for param in ['host', 'height', 'prevent_thread_lock', 'show_error']:
+            if param in kwargs:
+                del kwargs[param]
+                
         # Check which version of Gradio we're using
         if GRADIO_VERSION and GRADIO_VERSION.startswith('4.'):
             logger.info("Using Gradio 4.x in Codespaces")
-            # For Gradio 4.x, cleanup potentially incompatible parameters
-            if 'height' in kwargs:
-                del kwargs['height']
-            if 'prevent_thread_lock' in kwargs:
-                del kwargs['prevent_thread_lock']
-            if 'show_error' in kwargs:
-                del kwargs['show_error']
-            # Remove host parameter that's causing issues
-            if 'host' in kwargs:
-                del kwargs['host']
-                
+            
             try:
+                # Most reliable launch method for Gradio 4.x in Codespaces
+                import gradio as gr
+                
+                # For Gradio 4+, inbrowser must be False in Codespaces
+                kwargs['inbrowser'] = False
+                
+                # Set the favicon for better appearance
+                if 'favicon_path' not in kwargs:
+                    kwargs['favicon_path'] = os.path.join(os.path.dirname(os.path.dirname(__file__)), 
+                                                        "static", "favicon.ico")
+                
                 # Basic launch for Gradio 4.x
                 result = app.launch(**kwargs)
-                # Safely try to log the share URL if available
-                try:
-                    if hasattr(result, 'share_url') and result.share_url:
-                        logger.info("----------------------------------------")
-                        logger.info("🌎 Public URL: %s", result.share_url)
-                        logger.info("----------------------------------------")
-                except AttributeError:
-                    # If we can't access share_url attribute, don't crash
-                    pass
+                
+                # Show the URL prominently
+                if hasattr(result, 'local_url') and result.local_url:
+                    logger.info("\n" + "=" * 70)
+                    logger.info("🚀 LOCAL URL (within Codespaces): %s", result.local_url)
+                    logger.info("Open this URL in browser or click 'Open in Browser' in the PORTS tab")
+                    logger.info("=" * 70)
+                    
+                # Show the sharing URL if available
+                if hasattr(result, 'share_url') and result.share_url:
+                    logger.info("\n" + "=" * 70)
+                    logger.info("🌎 PUBLIC SHARING URL: %s", result.share_url)
+                    logger.info("=" * 70 + "\n")
+                
                 return result
             except Exception as e:
-                logger.warning(f"Launch failed with error: {str(e)}")
-                # Try a simpler approach
+                logger.warning(f"Standard launch failed with error: {str(e)}")
+                # Simplest possible fallback
                 return app.launch(server_name='0.0.0.0', share=True)
         else:
             # For Gradio 3.x

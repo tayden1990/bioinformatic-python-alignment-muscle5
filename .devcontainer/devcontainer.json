@@ -7,12 +7,12 @@
         }
     },
     "postCreateCommand": "pip install -r requirements.txt && chmod +x *.py",
-    "postStartCommand": "echo 'To start the application, run: python codespaces_start.py'",
+    "postStartCommand": "echo '🧬 MUSCLE5 Alignment Tool is ready. Run: python codespaces_start.py'",
     "forwardPorts": [7860],
     "portsAttributes": {
         "7860": {
             "label": "MUSCLE5 Web Interface",
-            "onAutoForward": "openBrowser"
+            "onAutoForward": "openPreview"
         }
     },
     "customizations": {
@@ -31,7 +31,9 @@
                         "path": "bash",
                         "args": ["-l"]
                     }
-                }
+                },
+                "workbench.startupEditor": "none",
+                "terminal.integrated.gpuAcceleration": "off"
             }
         }
     },

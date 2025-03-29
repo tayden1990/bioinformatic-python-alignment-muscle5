@@ -67,46 +67,39 @@ def launch_application():
     print("\nStarting MUSCLE5 Sequence Alignment Tool...")
     print("The application will be accessible in your browser shortly.\n")
     
+    # Set environment variable to indicate we're in Codespaces mode
+    os.environ["MUSCLE5_CODESPACES_MODE"] = "1"
+    
     # For Gradio 4.x, use a different launch approach
     if gradio_version.startswith("4."):
         print("Using launch method for Gradio 4.x")
         
-        # Import and create the application
-        from app import create_ui
-        app = create_ui()
-        
-        # Launch with settings compatible with Codespaces and Gradio 4.x
         try:
-            # First attempt: Use server_name parameter
-            print("Launching with Codespaces-compatible settings...")
-            result = app.launch(
-                server_name="0.0.0.0",
-                share=True,
-                quiet=False
-            )
-            
-            # Display public URL if available
-            if hasattr(result, 'share_url') and result.share_url:
-                print("\n" + "=" * 60)
-                print(f"🌎 PUBLIC SHARING URL: {result.share_url}")
-                print("=" * 60 + "\n")
-                
-            return True
-            
+            # Directly execute app.py - this is more reliable than importing
+            print("Launching application directly...")
+            result = subprocess.run([sys.executable, "app.py"], check=True)
+            if result.returncode == 0:
+                return True
+            return False
         except Exception as e:
-            print(f"First launch attempt failed: {str(e)}")
-            print("Trying alternative launch method...")
+            print(f"Direct launch failed: {str(e)}")
+            print("Trying alternative launch approach...")
             
             try:
-                # Second attempt: Simplified parameters
-                result = app.launch(server_name="0.0.0.0", share=True)
+                # Import and create the application as fallback
+                from app import create_ui
+                app = create_ui()
+                
+                # Simple launch parameters
+                result = app.launch(
+                    server_name="0.0.0.0",
+                    share=True
+                )
                 return True
             except Exception as e2:
-                print(f"Second launch attempt failed: {str(e2)}")
-                print("Falling back to direct module execution...")
-                
-                # Third attempt: Execute app.py directly
-                subprocess.run([sys.executable, "app.py"])
+                print(f"Alternative launch failed: {str(e2)}")
+                print("Trying with run_simple.py as last resort...")
+                subprocess.run([sys.executable, "run_simple.py"])
                 return True
     else:
         # For Gradio 3.x or other versions
