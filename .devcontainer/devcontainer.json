@@ -11,7 +11,7 @@
     "forwardPorts": [7860],
     "portsAttributes": {
         "7860": {
-            "label": "Gradio Web Interface",
+            "label": "MUSCLE5 Web Interface",
             "onAutoForward": "openBrowser"
         }
     },

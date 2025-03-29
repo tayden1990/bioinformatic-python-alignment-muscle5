@@ -1,91 +1,129 @@
 #!/usr/bin/env python3
 """
-Single-command starter for MUSCLE5 Sequence Alignment Tool in GitHub Codespaces.
-Just run: python codespaces_start.py
+GitHub Codespaces starter script for MUSCLE5 Sequence Alignment Tool
+Handles compatibility with Gradio versions and Codespaces environment
 """
 
 import os
 import sys
-import subprocess
+import platform
+from datetime import datetime
 import time
-from pathlib import Path
+import subprocess
 
-# ANSI color codes for terminal output
-COLORS = {
-    "blue": "\033[94m",
-    "green": "\033[92m",
-    "yellow": "\033[93m",
-    "red": "\033[91m",
-    "bold": "\033[1m",
-    "reset": "\033[0m"
-}
-
-def print_header():
-    """Print a simple welcome message"""
-    os.system('cls' if os.name == 'nt' else 'clear')
-    
-    print(f"{COLORS['bold']}{COLORS['blue']}======================================================{COLORS['reset']}")
-    print(f"{COLORS['bold']}{COLORS['green']}   MUSCLE5 SEQUENCE ALIGNMENT TOOL - CODESPACES     {COLORS['reset']}")
-    print(f"{COLORS['bold']}{COLORS['blue']}======================================================{COLORS['reset']}")
-    print()
-    print(f"{COLORS['yellow']}Starting the application in GitHub Codespaces...{COLORS['reset']}")
+def print_banner():
+    """Print a colorful header for Codespaces environment"""
+    banner = """
+    __  ___                __     ______     _____                                  
+   /  |/  /_  _________  / /__  / ____/____/ ___/___  _____  __  _____ ____  ______
+  / /|_/ / / / / ___/ _ \/ / _ \/___ \/ ___/\__ \/ _ \/ __ \/ / / / _ \\_  / / / / /
+ / /  / / /_/ (__  )  __/ /  __/___/ / /__ ___/ /  __/ / / / /_/ /  __// /_/ /_/ / 
+/_/  /_/\\__,_/____/\\___/_/\\___/_____/\\___//____/\\___/_/ /_/\\__, /\\___/___/\\__, /  
+                                                          /____/         /____/   
+    """
+    print(banner)
+    print("MUSCLE5 Sequence Alignment Tool - GitHub Codespaces Edition")
+    print(f"Starting application at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print("-" * 80)
+    print(f"System: {platform.system()} {platform.machine()}")
+    print(f"Python: {platform.python_version()}")
+    print("-" * 80)
     print()
 
-def setup_muscle():
-    """Ensure MUSCLE5 is downloaded and configured"""
-    print(f"{COLORS['blue']}➤ Checking MUSCLE5 installation...{COLORS['reset']}")
+def check_muscle_installation():
+    """Check if MUSCLE5 is installed and setup if needed"""
+    from app import check_and_setup_muscle
     
-    muscle_config = Path("muscle_config.txt")
-    if muscle_config.exists() and muscle_config.read_text().strip():
-        muscle_path = muscle_config.read_text().strip()
-        if Path(muscle_path).exists():
-            print(f"{COLORS['green']}  ✓ MUSCLE5 is already configured{COLORS['reset']}")
+    print("Checking MUSCLE5 installation...")
+    result = check_and_setup_muscle()
+    
+    if result:
+        print("✅ MUSCLE5 is ready to use")
+    else:
+        print("⚠️ MUSCLE5 setup issue - will attempt to fix during startup")
+    
+    print()
+    return result
+
+def get_gradio_version():
+    """Get the installed Gradio version"""
+    try:
+        import gradio
+        version = getattr(gradio, "__version__", "unknown")
+        print(f"Detected Gradio version: {version}")
+        return version
+    except ImportError:
+        print("WARNING: Gradio not installed. Installing required packages...")
+        subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
+        import gradio
+        version = getattr(gradio, "__version__", "unknown")
+        print(f"Installed Gradio version: {version}")
+        return version
+
+def launch_application():
+    """Launch the application with the best method for Codespaces"""
+    gradio_version = get_gradio_version()
+    
+    print("\nStarting MUSCLE5 Sequence Alignment Tool...")
+    print("The application will be accessible in your browser shortly.\n")
+    
+    # For Gradio 4.x, use a different launch approach
+    if gradio_version.startswith("4."):
+        print("Using launch method for Gradio 4.x")
+        
+        # Import and create the application
+        from app import create_ui
+        app = create_ui()
+        
+        # Launch with settings compatible with Codespaces and Gradio 4.x
+        try:
+            # First attempt: Use server_name parameter
+            print("Launching with Codespaces-compatible settings...")
+            result = app.launch(
+                server_name="0.0.0.0",
+                share=True,
+                quiet=False
+            )
+            
+            # Display public URL if available
+            if hasattr(result, 'share_url') and result.share_url:
+                print("\n" + "=" * 60)
+                print(f"🌎 PUBLIC SHARING URL: {result.share_url}")
+                print("=" * 60 + "\n")
+                
             return True
-    
-    print(f"{COLORS['yellow']}  ⚙ Setting up MUSCLE5...{COLORS['reset']}")
-    try:
-        subprocess.run([sys.executable, "setup_muscle.py", "--force"], check=True)
-        print(f"{COLORS['green']}  ✓ MUSCLE5 setup complete{COLORS['reset']}")
+            
+        except Exception as e:
+            print(f"First launch attempt failed: {str(e)}")
+            print("Trying alternative launch method...")
+            
+            try:
+                # Second attempt: Simplified parameters
+                result = app.launch(server_name="0.0.0.0", share=True)
+                return True
+            except Exception as e2:
+                print(f"Second launch attempt failed: {str(e2)}")
+                print("Falling back to direct module execution...")
+                
+                # Third attempt: Execute app.py directly
+                subprocess.run([sys.executable, "app.py"])
+                return True
+    else:
+        # For Gradio 3.x or other versions
+        print("Using compatibility mode for Gradio 3.x")
+        subprocess.run([sys.executable, "run_simple.py"])
         return True
-    except Exception as e:
-        print(f"{COLORS['red']}  ✗ MUSCLE5 setup failed: {str(e)}{COLORS['reset']}")
-        return False
-
-def run_application():
-    """Start the application with proper settings for Codespaces"""
-    print(f"{COLORS['blue']}➤ Starting application server...{COLORS['reset']}")
-    
-    # Set required environment variables for Codespaces
-    os.environ["GRADIO_SERVER_NAME"] = "0.0.0.0"
-    os.environ["GRADIO_SERVER_PORT"] = "7860"
-    
-    # Start the actual application
-    print(f"{COLORS['green']}  ✓ Application starting at http://127.0.0.1:7860{COLORS['reset']}")
-    print(f"{COLORS['yellow']}  ⚙ When the browser tab opens, wait for the interface to fully load{COLORS['reset']}")
-    print(f"{COLORS['yellow']}  ⚙ If no browser opens, click the 'PORTS' tab and the 'Open in Browser' icon{COLORS['reset']}")
-    print()
-    print(f"{COLORS['bold']}Press Ctrl+C to stop the application when finished{COLORS['reset']}")
-    print()
-    
-    # Start the main app with parameters optimized for Codespaces
-    try:
-        subprocess.run([
-            sys.executable, "app.py",
-            "--server-name=0.0.0.0",
-            "--server-port=7860", 
-            "--share=true"
-        ])
-    except KeyboardInterrupt:
-        print(f"\n{COLORS['yellow']}Application stopped by user{COLORS['reset']}")
 
 def main():
-    """Main entry point"""
-    print_header()
+    print_banner()
+    check_muscle_installation()
+    success = launch_application()
     
-    if setup_muscle():
-        run_application()
-    else:
-        print(f"{COLORS['red']}Unable to start application due to MUSCLE5 setup failure.{COLORS['reset']}")
+    if not success:
+        print("\n⚠️ Application failed to start properly.")
+        print("Try running one of these commands manually:")
+        print("  python app.py")
+        print("  python run_simple.py")
         return 1
     
     return 0

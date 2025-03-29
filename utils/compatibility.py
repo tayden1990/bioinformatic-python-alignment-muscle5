@@ -77,9 +77,6 @@ def launch_app(app, **kwargs):
         # Set server_name to 0.0.0.0 for Codespaces
         kwargs['server_name'] = '0.0.0.0'
         
-        # Set host to 0.0.0.0 for Gradio 4.x
-        kwargs['host'] = '0.0.0.0'
-        
         # Check which version of Gradio we're using
         if GRADIO_VERSION and GRADIO_VERSION.startswith('4.'):
             logger.info("Using Gradio 4.x in Codespaces")
@@ -90,6 +87,9 @@ def launch_app(app, **kwargs):
                 del kwargs['prevent_thread_lock']
             if 'show_error' in kwargs:
                 del kwargs['show_error']
+            # Remove host parameter that's causing issues
+            if 'host' in kwargs:
+                del kwargs['host']
                 
             try:
                 # Basic launch for Gradio 4.x

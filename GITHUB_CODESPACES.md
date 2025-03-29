@@ -1,30 +1,27 @@
 # Running MUSCLE5 Alignment Tool in GitHub Codespaces
 
-This guide explains how to run the MUSCLE5 Alignment Tool in GitHub Codespaces without installing anything on your computer.
+GitHub Codespaces provides an easy way to run the MUSCLE5 Alignment Tool without any local installation. This guide will help you get started.
 
-## Quick Start (One-Command Method)
+## Quick Start
 
-1. Click the "Code" button on the GitHub repository
+1. Click the green "Code" button at the top of this repository
 2. Select the "Codespaces" tab
 3. Click "Create codespace on main"
-4. Once the environment loads, run this single command:
-
+4. Once the environment loads (this might take a minute), run:
    ```bash
    python codespaces_start.py
    ```
+5. Click the "Open in Browser" notification when it appears, or click the "PORTS" tab at the bottom of VS Code, then click the "Open in Browser" icon next to port 7860
 
-5. A browser tab will automatically open with the application
+The application will then open in a new browser tab, fully configured and ready to use.
 
-That's it! The script handles everything else for you.
+## What Happens Automatically
 
-## What Happens Behind the Scenes
+When you start a Codespace:
 
-The `codespaces_start.py` script:
-
-1. Checks if MUSCLE5 is installed and downloads it if needed
-2. Configures the environment variables correctly for Codespaces
-3. Starts the application server with proper settings
-4. Opens a browser tab with the Gradio interface
+1. Python and all dependencies are installed automatically
+2. MUSCLE5 is downloaded and configured for your session
+3. The web interface will be available on port 7860
 
 ## Troubleshooting
 
@@ -51,3 +48,9 @@ When running in GitHub Codespaces:
 - Large alignments (>100 sequences) might take longer to process
 - File uploads are limited to 200MB
 - The session will terminate after 30 minutes of inactivity
+
+## Saving Your Work
+
+To save your work before the session times out:
+- Use the "Export Results" button to download alignment results
+- Save any important sequence data to your local machine
