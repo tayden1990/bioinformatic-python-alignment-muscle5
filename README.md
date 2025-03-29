@@ -2,6 +2,31 @@
 
 A Python-based graphical interface for the MUSCLE5 multiple sequence alignment algorithm with advanced visualization and analysis capabilities.
 
+## Overview
+
+The Muscle5 Sequence Alignment Tool provides a user-friendly graphical interface to MUSCLE5 (MUltiple Sequence Comparison by Log-Expectation), one of the most powerful and accurate algorithms for multiple sequence alignment in bioinformatics. This tool bridges the gap between command-line bioinformatics tools and researchers by providing an intuitive web interface with advanced visualization capabilities.
+
+### What is Multiple Sequence Alignment?
+
+Multiple Sequence Alignment (MSA) is a fundamental technique in bioinformatics that arranges biological sequences (DNA, RNA, or protein) to identify regions of similarity. These similarities may be consequences of functional, structural, or evolutionary relationships between the sequences. MSA is essential for:
+
+- Identifying conserved domains and motifs
+- Constructing phylogenetic trees
+- Predicting protein structure and function
+- Analyzing genetic variations (SNPs, insertions, deletions)
+- Designing PCR primers and probes
+- Guiding CRISPR-Cas9 targeting
+
+### Why MUSCLE5?
+
+MUSCLE5 represents a significant advancement over previous alignment algorithms with:
+
+- Higher accuracy compared to other popular alignment tools
+- Faster performance for large datasets
+- Advanced ensemble-based methods that provide statistical confidence measures
+- Superior handling of divergent sequences
+- Efficient memory usage for very large alignments
+
 ## Screenshots
 
 <div align="center">
@@ -36,11 +61,50 @@ A Python-based graphical interface for the MUSCLE5 multiple sequence alignment a
 ## Features
 
 - **Powerful Sequence Alignment**: Harness the power of MUSCLE5, a state-of-the-art multiple sequence alignment algorithm
-- **Interactive Visualization**: Visualize alignments with color-coded nucleotides, SNP highlighting, and conserved region identification
-- **Conservation Analysis**: Automatically identify and analyze conserved regions across sequences
-- **Multiple Export Formats**: Export alignments in various formats (FASTA, Clustal, PHYLIP, NEXUS, Stockholm)
-- **Stratified Ensemble Support**: Generate and analyze multiple alignments to evaluate quality
-- **Super5 Algorithm**: Special support for very large datasets (>1000 sequences)
+  - Implements the PPP (Progressive, Progressive, Progressive) algorithm for high accuracy
+  - Optimized for both closely and distantly related sequences
+  - Automated parameter selection based on dataset characteristics
+
+- **Interactive Visualization**: Rich, interactive alignment visualization
+  - Color-coded nucleotides for easy pattern recognition (A=green, C=blue, G=orange, T=red)
+  - Automatic SNP highlighting to identify variations between sequences
+  - Conserved region identification with region-specific analysis
+  - Zoomable and navigable interface for exploring large alignments
+  - Customizable display with sequence labels and position indicators
+
+- **Conservation Analysis**: Comprehensive analysis of sequence conservation
+  - Automatic identification of conserved regions across all sequences
+  - Quantitative assessment of conservation by region
+  - Tabular display of conserved regions with start, end, length, and sequence
+  - Prioritization of regions by conservation length
+  - Detection of potential functional motifs based on conservation patterns
+
+- **Advanced Algorithmic Options**:
+  - **Stratified Ensemble Support**: Generate multiple alignments to assess alignment quality
+    - Statistical confidence measures for aligned positions
+    - Dispersion analysis to evaluate alignment stability
+    - Identification of regions with alignment uncertainty
+  - **Super5 Algorithm**: Specialized algorithm for very large datasets
+    - Efficient processing of alignments with >1000 sequences
+    - Reduced memory footprint for large genomic datasets
+    - Maintains accuracy while dramatically improving performance
+
+- **Comprehensive Export Capabilities**:
+  - Export complete alignments or specific regions of interest
+  - Multiple format support (FASTA, Clustal, PHYLIP, NEXUS, Stockholm)
+  - Format-specific optimization for downstream analysis
+  - Direct integration with other bioinformatics tools
+
+- **High-Performance Computing Integration**:
+  - Automatic detection and utilization of available CPU cores
+  - Memory optimization for large sequence datasets
+  - Progress tracking for long-running alignments
+  - Error handling with informative diagnostic messages
+
+- **Cross-Platform Compatibility**:
+  - Runs on Windows, macOS, and Linux
+  - Cloud deployment support via Docker and GitHub Codespaces
+  - Consistent interface across all platforms
 
 ## Installation
 
@@ -158,6 +222,129 @@ The web interface will be available at http://127.0.0.1:7860/
 
 </details>
 
+### Detailed Usage Guide
+
+#### Preparing Input Data
+
+The tool accepts FASTA format sequence files containing nucleotide (DNA/RNA) sequences. Each sequence in the FASTA file should:
+- Begin with a ">" character followed by a unique identifier/description
+- Contain valid nucleotide characters (A, C, G, T/U, and occasionally ambiguity codes)
+
+Example of a valid FASTA file:
+```
+>Sequence1_Identifier
+ATGCGTACGATCGATCGATCGCTAGCTAGCTGACGTATCGATCG
+>Sequence2_Identifier
+ATGCGTACGTTCGATCGATCGCTAGCTAGCTGACGTATCGATCG
+```
+
+For best results:
+- Remove any non-nucleotide characters or whitespace
+- Ensure each sequence has a unique, descriptive identifier
+- For comparative analysis, sequences should be from homologous regions
+- Pre-trim sequences to remove low-quality ends if applicable
+
+#### Choosing the Right Alignment Method
+
+**Standard Alignment (PPP Algorithm):**
+- Recommended for most datasets with <1000 sequences
+- Balances speed and accuracy
+- Works well for sequences with moderate similarity (~40-90% identity)
+- Use when analyzing a typical set of variant sequences or closely related genes
+
+**Stratified Ensemble:**
+- Recommended when alignment quality assessment is important
+- Creates multiple alignments and evaluates consistency between them
+- Provides statistical confidence measures for aligned positions
+- Use for:
+  - Phylogenetic analysis where alignment quality impacts tree topology
+  - Detecting subtle sequence patterns in moderately divergent sequences
+  - Identifying regions of alignment uncertainty
+  - Publication-quality alignments requiring confidence metrics
+
+**Super5 Algorithm:**
+- Recommended for very large datasets (>1000 sequences)
+- Optimized for memory efficiency with large alignments
+- Maintains accuracy while significantly reducing computational requirements
+- Use for:
+  - Metagenomic dataset analysis
+  - Pan-genome comparisons
+  - Large-scale variant analysis
+  - Whole-genome alignments of related species
+
+#### Analyzing Alignment Results
+
+**Alignment Text Tab:**
+- Shows raw alignment output in standard FASTA format
+- Useful for:
+  - Inspecting exact positioning of indels (insertions/deletions)
+  - Copying raw alignment data for external tools
+  - Verifying alignment completion and success
+
+**DNA Visualization Tab:**
+- Interactive color-coded representation of the alignment
+- Yellow highlighting indicates SNPs (Single Nucleotide Polymorphisms)
+- Green highlighting shows conserved regions
+- Features:
+  - Zoom in/out to examine specific regions
+  - Hover over bases to see position and nucleotide information
+  - Sequence names displayed on the left for reference
+  - Navigation slider to move through long alignments
+
+**Conservation Analysis Tab:**
+- Tabular display of conserved regions sorted by length
+- Each row represents a continuous conserved region with:
+  - Start position (1-based indexing)
+  - End position
+  - Length of conservation
+  - Actual conserved sequence
+- Useful for:
+  - Identifying functional motifs and domains
+  - Designing PCR primers in conserved regions
+  - Locating potential regulatory elements
+  - Targeting regions for further experimental analysis
+
+**Export Options Tab:**
+- Convert alignments to various formats for downstream analysis
+- Format options:
+  - **FASTA**: Most common format, compatible with nearly all bioinformatics tools
+  - **Clustal**: Emphasizes conservation with consensus sequence and conservation symbols
+  - **PHYLIP**: Optimized for phylogenetic software like RAxML, PhyML
+  - **NEXUS**: Enhanced format for evolutionary analysis programs like MrBayes, BEAST
+  - **Stockholm**: Standard format for RNA analysis and compatible with Rfam
+- Region selection allows exporting only portions of interest
+- Direct download or clipboard copy options
+
+#### Advanced Use Cases
+
+**Viral Sequence Analysis:**
+- Upload multiple viral strain sequences (e.g., SARS-CoV-2 variants)
+- Use Standard Alignment or Stratified Ensemble
+- Examine SNPs in the Visualization tab to identify key mutations
+- Create exportable tables of conserved regions for primer design
+- Export in FASTA format for phylogenetic analysis or GISAID submission
+
+**Bacterial Gene Family Analysis:**
+- Upload homologous genes from multiple bacterial species
+- Use Stratified Ensemble for divergent sequences
+- Identify conserved domains that may indicate functional importance
+- Export specific regions in NEXUS format for evolutionary analysis
+- Use conservation data to guide site-directed mutagenesis experiments
+
+**Large Dataset Processing:**
+- Upload thousands of sequences from metagenomic studies
+- Use Super5 algorithm for efficient processing
+- Examine overall conservation patterns across the large dataset
+- Export in compatible formats for taxonomic classification
+- Identify consensus sequences for representative analysis
+
+**Primer Design Workflow:**
+- Align target sequences from multiple strains/species
+- Use Visualization tab to identify regions with high conservation
+- Switch to Conservation Analysis to get exact coordinates and sequences
+- Export conserved regions for verification in primer design tools
+- Test primers against the full alignment to check coverage
+
 ### Advanced Usage
 
 #### Command-line Options
@@ -189,9 +376,44 @@ muscle5 -align input.fasta -output aligned.fasta -stratified
 muscle5 -super5 input.fasta -output aligned.fasta
 ```
 
+#### Integration with Other Bioinformatics Tools
+
+This tool works seamlessly with other bioinformatics software:
+
+**Phylogenetic Analysis Workflow:**
+1. Align sequences using Muscle5 Sequence Alignment Tool
+2. Export in PHYLIP format
+3. Build phylogenetic trees using RAxML, IQ-TREE, or PhyML
+4. Visualize trees with FigTree or iTOL
+
+**Primer Design Pipeline:**
+1. Align target sequences with Muscle5 Sequence Alignment Tool
+2. Identify conserved regions using Conservation Analysis
+3. Export regions to Primer3 or PrimerBLAST
+4. Verify primer specificity with electronic PCR
+
+**Metagenomics Classification:**
+1. Align unknown sequences with reference database using Super5
+2. Export alignment in compatible format
+3. Use Kraken2, MEGAN, or other classification tools
+4. Visualize taxonomic assignments
+
 ## Example Data
 
 Sample FASTA files are provided in the `example_data` directory to help you get started.
+
+- `example.fasta`: Small set of 5 sequences for testing basic functionality
+- `covid_variants.fasta`: SARS-CoV-2 variant sequences for comparing mutations
+
+### Example Analysis Walkthrough
+
+**COVID-19 Variant Analysis:**
+1. Load `covid_variants.fasta` from the example_data directory
+2. Select "Stratified Ensemble" for higher confidence alignment
+3. Run the alignment
+4. In the Visualization tab, observe the highlighted SNPs that indicate mutations
+5. Switch to Conservation Analysis to identify regions conserved across all variants
+6. Export the alignment in FASTA format for further analysis
 
 ## Troubleshooting
 
