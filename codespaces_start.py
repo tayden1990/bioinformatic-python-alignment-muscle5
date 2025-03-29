@@ -7,12 +7,12 @@ Handles compatibility with Gradio versions and Codespaces environment
 import os
 import sys
 import platform
-from datetime import datetime
-import time
+import datetime
 import subprocess
+import importlib.util
 
 def print_banner():
-    """Print a colorful header for Codespaces environment"""
+    """Print a fancy ASCII banner for the application."""
     banner = """
     __  ___                __     ______     _____                                  
    /  |/  /_  _________  / /__  / ____/____/ ___/___  _____  __  _____ ____  ______
@@ -23,103 +23,101 @@ def print_banner():
     """
     print(banner)
     print("MUSCLE5 Sequence Alignment Tool - GitHub Codespaces Edition")
-    print(f"Starting application at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"Starting application at {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("-" * 80)
     print(f"System: {platform.system()} {platform.machine()}")
     print(f"Python: {platform.python_version()}")
     print("-" * 80)
     print()
 
-def check_muscle_installation():
-    """Check if MUSCLE5 is installed and setup if needed"""
-    from app import check_and_setup_muscle
-    
+def check_muscle5():
+    """Check if MUSCLE5 is installed and accessible."""
     print("Checking MUSCLE5 installation...")
-    result = check_and_setup_muscle()
-    
-    if result:
-        print("✅ MUSCLE5 is ready to use")
-    else:
-        print("⚠️ MUSCLE5 setup issue - will attempt to fix during startup")
-    
-    print()
-    return result
-
-def get_gradio_version():
-    """Get the installed Gradio version"""
     try:
-        import gradio
-        version = getattr(gradio, "__version__", "unknown")
-        print(f"Detected Gradio version: {version}")
-        return version
-    except ImportError:
-        print("WARNING: Gradio not installed. Installing required packages...")
-        subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
-        import gradio
-        version = getattr(gradio, "__version__", "unknown")
-        print(f"Installed Gradio version: {version}")
-        return version
-
-def launch_application():
-    """Launch the application with the best method for Codespaces"""
-    gradio_version = get_gradio_version()
-    
-    print("\nStarting MUSCLE5 Sequence Alignment Tool...")
-    print("The application will be accessible in your browser shortly.\n")
-    
-    # Set environment variable to indicate we're in Codespaces mode
-    os.environ["MUSCLE5_CODESPACES_MODE"] = "1"
-    
-    # For Gradio 4.x, use a different launch approach
-    if gradio_version.startswith("4."):
-        print("Using launch method for Gradio 4.x")
+        # Read the path from config file
+        with open("muscle_config.txt", "r") as f:
+            muscle_path = f.read().strip()
         
-        try:
-            # Directly execute app.py - this is more reliable than importing
-            print("Launching application directly...")
-            result = subprocess.run([sys.executable, "app.py"], check=True)
-            if result.returncode == 0:
-                return True
-            return False
-        except Exception as e:
-            print(f"Direct launch failed: {str(e)}")
-            print("Trying alternative launch approach...")
+        # Check if the file exists
+        if not os.path.exists(muscle_path):
+            print("⚠️ MUSCLE5 path not found at configured location")
+            print(f"   Path: {muscle_path}")
+            print("   Attempting to find MUSCLE5 in PATH...")
             
+            # Try to find muscle5 in PATH
             try:
-                # Import and create the application as fallback
-                from app import create_ui
-                app = create_ui()
-                
-                # Simple launch parameters
-                result = app.launch(
-                    server_name="0.0.0.0",
-                    share=True
-                )
+                subprocess.run(["muscle5", "-version"], capture_output=True, check=False)
+                print("✅ Found MUSCLE5 in PATH")
+                # Update config file
+                with open("muscle_config.txt", "w") as f:
+                    f.write("muscle5")
                 return True
-            except Exception as e2:
-                print(f"Alternative launch failed: {str(e2)}")
-                print("Trying with run_simple.py as last resort...")
-                subprocess.run([sys.executable, "run_simple.py"])
+            except FileNotFoundError:
+                print("❌ MUSCLE5 not found in PATH")
+                print("Please download MUSCLE5 and set the path in the application.")
+                return False
+        else:
+            # Check if it's runnable
+            try:
+                subprocess.run([muscle_path, "-version"], capture_output=True, check=False)
+                print("✅ MUSCLE5 is ready to use")
                 return True
-    else:
-        # For Gradio 3.x or other versions
-        print("Using compatibility mode for Gradio 3.x")
-        subprocess.run([sys.executable, "run_simple.py"])
-        return True
+            except Exception as e:
+                print(f"❌ Error running MUSCLE5: {str(e)}")
+                return False
+    except Exception as e:
+        print(f"❌ Error checking MUSCLE5: {str(e)}")
+        return False
 
 def main():
+    """Main function to start the application in Codespaces."""
     print_banner()
-    check_muscle_installation()
-    success = launch_application()
+    check_muscle5()
     
-    if not success:
-        print("\n⚠️ Application failed to start properly.")
-        print("Try running one of these commands manually:")
-        print("  python app.py")
-        print("  python run_simple.py")
-        return 1
-    
-    return 0
+    # Check Gradio version for compatibility
+    try:
+        gradio_spec = importlib.util.find_spec("gradio")
+        if gradio_spec:
+            import gradio as gr
+            print(f"\nDetected Gradio version: {gr.__version__}")
+            
+            print("\nStarting MUSCLE5 Sequence Alignment Tool...")
+            print("The application will be accessible in your browser shortly.\n")
+            
+            # Import and run the main application
+            # Make sure we're using correct launch parameters for GitHub Codespaces
+            gradio_version = gr.__version__.split('.')
+            major_version = int(gradio_version[0])
+            
+            if major_version >= 4:
+                print("Using launch method for Gradio 4.x")
+                # Import main app module and run it with Codespaces-compatible settings
+                from app import create_app
+                demo = create_app()
+                demo.launch(
+                    server_name="0.0.0.0",  # Listen on all interfaces
+                    server_port=7860,       # Use the default Gradio port
+                    share=True,             # Enable public sharing
+                    inbrowser=False,        # Don't try to open a browser
+                    debug=False             # Disable debug mode for production
+                )
+            else:
+                print("Using launch method for Gradio 3.x")
+                # Import main app module and run it with Codespaces-compatible settings
+                import app
+                app.main(
+                    server_name="0.0.0.0",  # Listen on all interfaces
+                    server_port=7860,       # Use the default Gradio port
+                    share=True,             # Enable public sharing
+                    inbrowser=False,        # Don't try to open a browser
+                    debug=False             # Disable debug mode for production
+                )
+        else:
+            print("❌ Gradio not installed. Please install with: pip install gradio")
+            sys.exit(1)
+    except Exception as e:
+        print(f"❌ Error starting application: {str(e)}")
+        sys.exit(1)
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

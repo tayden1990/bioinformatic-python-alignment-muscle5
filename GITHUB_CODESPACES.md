@@ -71,3 +71,51 @@ When running in GitHub Codespaces:
 To save your work before the session times out:
 - Use the "Export Results" button to download alignment results
 - Save any important sequence data to your local machine
+
+# Running in GitHub Codespaces
+
+This guide provides instructions for using the MUSCLE5 Sequence Alignment Tool in GitHub Codespaces.
+
+## Automatic Startup
+
+When you open this repository in GitHub Codespaces, the application should start automatically. If it doesn't, you can start it manually:
+
+```bash
+python codespaces_start.py
+```
+
+## Access the Application
+
+When the application starts, you'll see a public URL in the terminal output that looks like:
+```
+Running on public URL: https://xxxxxxxxxxxxx.gradio.live
+```
+
+Click on this URL to access the full application interface.
+
+## Troubleshooting
+
+If you see only a placeholder message instead of the full application:
+
+1. Check the terminal output for any error messages
+2. Ensure the application has fully started before accessing the URL
+3. Try restarting the application with: `python codespaces_start.py`
+4. If problems persist, try refreshing the browser or using a different browser
+
+## Important Notes
+
+- The public sharing URL is temporary and will expire after 72 hours
+- For large datasets, consider downloading the application and running it locally
+- GitHub Codespaces sessions will timeout after 30 minutes of inactivity
+- The MUSCLE5 executable is included in the Codespaces environment by default
+
+## Performance Considerations
+
+GitHub Codespaces provides limited resources. For large sequence alignments:
+- Use the Super5 algorithm option for better memory efficiency
+- Consider running locally for very large datasets (>10MB)
+- Export your results frequently to avoid losing work
+
+## Getting Help
+
+If you encounter issues running the application in GitHub Codespaces, please [open an issue](https://github.com/tayden1990/bioinformatic-python-alignment-muscle5/issues) with details about the problem.

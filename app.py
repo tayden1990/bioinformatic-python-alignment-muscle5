@@ -25,8 +25,10 @@ except ImportError:
     
     def has_pyobjc():
         try:
-            import pyobjc_framework_Cocoa
-            return True
+            # Use importlib to check for the module without directly importing it
+            import importlib.util
+            spec = importlib.util.find_spec("pyobjc_framework_Cocoa")
+            return spec is not None
         except ImportError:
             return False
     
@@ -1056,6 +1058,20 @@ def create_ui():
         pass
     
     return app
+
+def create_app():
+    """
+    Create and return the Gradio interface without launching it.
+    Used by codespaces_start.py to launch with custom parameters.
+    """
+    # Create the interface using the existing UI function
+    app = create_ui()
+    return app
+
+# If this script is run directly (not imported), launch the app normally
+if __name__ == "__main__":
+    demo = create_app()
+    demo.launch()
 
 if __name__ == "__main__":
     # Run MUSCLE5 setup check
