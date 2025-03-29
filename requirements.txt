@@ -1,10 +1,35 @@
-# Core dependencies
-gradio>=3.40.1
-biopython>=1.81
-plotly>=5.14.1
-pandas>=2.0.0
-numpy>=1.24.0
-psutil>=5.9.0
+# Core dependencies with specific versions for reproducibility
+gradio>=3.40.1,<5.0.0        # Web interface framework (compatible with both 3.x and 4.x)
+biopython>=1.81,<2.0.0       # Biological sequence handling and analysis
+plotly>=5.14.1,<6.0.0        # Interactive data visualization
+pandas>=2.0.0,<3.0.0         # Data manipulation and analysis
+numpy>=1.24.0,<2.0.0         # Numerical computing
+psutil>=5.9.0,<6.0.0         # System monitoring and resource management
 
-# If running in Codespaces with Gradio 4.x, consider pinning the version:
-# gradio==3.50.2
+# Visualization libraries
+Pillow>=9.0.0,<10.0.0        # Image processing (needed for screenshots and icon generation)
+matplotlib>=3.5.0,<4.0.0     # Additional plotting capabilities
+
+# HTTP and utility packages
+requests>=2.28.0,<3.0.0      # For HTTP requests (used in setup scripts)
+packaging>=21.0,<24.0        # Used for version handling
+tqdm>=4.64.0,<5.0.0          # Progress bars for downloads
+
+# Platform-specific optimizations
+pywin32>=305; sys_platform == "win32"                # Windows-specific functionalities
+pyobjc-framework-Cocoa>=9.0; sys_platform == "darwin"  # macOS-specific functionalities
+
+# Development utilities (not installed in production with -p option)
+pytest>=7.0.0,<8.0.0; extra == 'dev'     # Testing framework
+black>=23.0.0; extra == 'dev'            # Code formatting
+flake8>=6.0.0; extra == 'dev'            # Code linting
+pre-commit>=3.0.0; extra == 'dev'        # Git hooks for code quality
+
+# Auto GitHub Codespaces detection and compatibility
+gradio==3.50.2; environ.get('CODESPACES', '') != '' and environ.get('GRADIO_ANALYTICS_ENABLED', '')  # Pin version for Codespaces
+
+# Installation optimization flags
+# Use pip install -r requirements.txt --no-cache-dir --upgrade --use-pep517
+
+# For reproducible builds with pip-tools, uncomment:
+# pip-tools>=7.0.0; extra == 'dev'
