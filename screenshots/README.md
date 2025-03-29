@@ -12,13 +12,7 @@ This directory contains screenshots of the application's UI and various environm
 - `screenshot_2025_03_29_161728.png` - Conservation analysis showing preserved regions across sequences
 - `screenshot_2025_03_29_161801.png` - Export options interface for saving alignments in various formats
 
-## Environment Screenshots
-
-- `windows_setup.png` - MUSCLE5 setup and configuration on Windows systems
-- `mac_setup.png` - MUSCLE5 installation and configuration on macOS
-- `linux_setup.png` - MUSCLE5 setup process on Linux environments
-- `muscle_config_app.png` - MUSCLE5 path configuration in the application
-- `muscle_download_page.png` - Screenshot of the MUSCLE5 download website
+<!-- Environment Screenshots section removed since these screenshots are no longer available -->
 
 ## Configuration Screenshots
 

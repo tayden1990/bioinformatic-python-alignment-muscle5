@@ -33,24 +33,6 @@ A Python-based graphical interface for the MUSCLE5 multiple sequence alignment a
   </table>
 </div>
 
-<details>
-<summary>Additional environment setup screenshots</summary>
-<div align="center">
-  <table>
-    <tr>
-      <td><img src="screenshots/windows_setup.png" alt="Windows Setup Instructions" width="280"/></td>
-      <td><img src="screenshots/mac_setup.png" alt="macOS Setup Instructions" width="280"/></td>
-      <td><img src="screenshots/linux_setup.png" alt="Linux Setup Instructions" width="280"/></td>
-    </tr>
-    <tr>
-      <td align="center"><b>Windows Setup</b></td>
-      <td align="center"><b>Mac Setup</b></td>
-      <td align="center"><b>Linux Setup</b></td>
-    </tr>
-  </table>
-</div>
-</details>
-
 ## Features
 
 - **Powerful Sequence Alignment**: Harness the power of MUSCLE5, a state-of-the-art multiple sequence alignment algorithm

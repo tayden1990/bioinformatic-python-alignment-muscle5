@@ -1,6 +1,6 @@
 # Muscle5 Alignment Tool Screenshot Gallery
 
-This page showcases screenshots of the Muscle5 Sequence Alignment Tool in action.
+This directory showcases screenshots of the Muscle5 Sequence Alignment Tool in action.
 
 ## User Interface
 
@@ -15,17 +15,6 @@ This page showcases screenshots of the Muscle5 Sequence Alignment Tool in action
 
 ### Export Options
 ![Export Options](../screenshots/export_options.png)
-
-## Installation & Configuration
-
-### Windows Setup
-![Windows Setup](../screenshots/windows_setup.png)
-
-### macOS Setup  
-![macOS Setup](../screenshots/mac_setup.png)
-
-### Linux Setup
-![Linux Setup](../screenshots/linux_setup.png)
 
 ## Usage Examples
 
