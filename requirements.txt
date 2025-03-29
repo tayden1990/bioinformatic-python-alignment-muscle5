@@ -26,7 +26,8 @@ flake8>=6.0.0; extra == 'dev'            # Code linting
 pre-commit>=3.0.0; extra == 'dev'        # Git hooks for code quality
 
 # GitHub Codespaces detection and compatibility
-gradio==3.50.2; os_environ.get('CODESPACES', '') != ''      # Pin version for Codespaces
+# Note: Environment variables can't be checked in requirement markers
+# We handle Codespaces-specific installations in install_requirements.py instead
 
 # Use pip install -r requirements.txt --no-cache-dir --upgrade --use-pep517
 
