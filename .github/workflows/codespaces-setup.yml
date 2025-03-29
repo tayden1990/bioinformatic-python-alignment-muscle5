@@ -1,0 +1,49 @@
+name: Codespaces Setup
+
+on:
+  # GitHub Codespaces is configured via devcontainer.json
+  # This workflow can be run manually when needed
+  workflow_dispatch:
+  
+  # Automatically run when pushing to main branch (optional)
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+          cache: 'pip'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
+      - name: Download MUSCLE5
+        run: |
+          python setup_muscle.py --force
+          
+      - name: Verify MUSCLE5 installation
+        run: |
+          cat muscle_config.txt
+          chmod +x $(cat muscle_config.txt)
+          $(cat muscle_config.txt) -version
+          
+      - name: Install additional tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget curl
+          
+      - name: Setup environment
+        run: |
+          echo "Setup complete! Run 'python app.py' to start the application."

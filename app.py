@@ -1012,4 +1012,13 @@ if __name__ == "__main__":
     check_and_setup_muscle()
     
     app = create_ui()
-    app.launch(share=False)
+    
+    # Check if running in GitHub Codespaces
+    codespaces_url = os.environ.get("CODESPACES", "")
+    if codespaces_url:
+        # GitHub Codespaces requires public=True and needs the host to be 0.0.0.0
+        print(f"Running in GitHub Codespaces environment")
+        app.launch(server_name="0.0.0.0", share=True)
+    else:
+        # Standard local launch
+        app.launch(share=False)

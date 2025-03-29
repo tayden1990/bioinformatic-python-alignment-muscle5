@@ -12,11 +12,23 @@ Download the appropriate MUSCLE5 executable for your operating system:
 
 You can also visit the [official MUSCLE website](https://drive5.com/muscle/) for the latest versions.
 
+<details>
+<summary>Screenshot: MUSCLE5 Download Page</summary>
+
+![MUSCLE5 Download Page](screenshots/muscle_download_page.png)
+</details>
+
 ## Step 2: Make the executable accessible
 
 ### Windows
 1. Save the downloaded `.exe` file to a location you can remember, such as `C:\Program Files\muscle\muscle.exe`
 2. No additional setup required, as `.exe` files are already executable
+
+<details>
+<summary>Screenshot: Windows Setup</summary>
+
+![Windows MUSCLE5 Setup](screenshots/windows_setup.png)
+</details>
 
 ### macOS
 1. Save the downloaded file to a location like `/usr/local/bin/muscle` or `~/Applications/muscle`
@@ -24,11 +36,23 @@ You can also visit the [official MUSCLE website](https://drive5.com/muscle/) for
 3. Make the file executable with: `chmod +x muscle5.1.macos`
 4. Optionally rename it to just `muscle` for simplicity: `mv muscle5.1.macos muscle`
 
+<details>
+<summary>Screenshot: macOS Setup</summary>
+
+![macOS MUSCLE5 Setup](screenshots/mac_setup.png)
+</details>
+
 ### Linux
 1. Save the downloaded file to a location like `/usr/local/bin/muscle` or `~/bin/muscle`
 2. Open Terminal and navigate to the folder where you saved the file
 3. Make the file executable with: `chmod +x muscle5.1.linux_intel64`
 4. Optionally rename it to just `muscle` for simplicity: `mv muscle5.1.linux_intel64 muscle`
+
+<details>
+<summary>Screenshot: Linux Setup</summary>
+
+![Linux MUSCLE5 Setup](screenshots/linux_setup.png)
+</details>
 
 ## Step 3: Configure the path in the application
 
@@ -37,6 +61,12 @@ You can also visit the [official MUSCLE website](https://drive5.com/muscle/) for
 3. Navigate to and select the MUSCLE5 executable you downloaded
 4. Click "Update MUSCLE5 Path"
 5. Verify the status shows a success message with a green checkmark
+
+<details>
+<summary>Screenshot: Application Configuration</summary>
+
+![MUSCLE5 Path Configuration](screenshots/muscle_config_app.png)
+</details>
 
 ## Troubleshooting
 

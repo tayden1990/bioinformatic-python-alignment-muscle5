@@ -2,7 +2,28 @@
 
 A Python-based graphical interface for the MUSCLE5 multiple sequence alignment algorithm with advanced visualization and analysis capabilities.
 
-![Muscle5 Tool Screenshot](screenshots/app_screenshot.png)
+## Screenshots
+
+<details>
+<summary>Click to expand screenshots gallery</summary>
+
+### Main Interface
+![Muscle5 Tool Main Interface](screenshots/app_screenshot.png)
+
+### DNA Visualization
+![DNA Sequence Visualization](screenshots/dna_visualization.png)
+
+### Conservation Analysis
+![Conservation Analysis](screenshots/conservation_analysis.png)
+
+### Environment Setup
+![Windows Setup](screenshots/windows_setup.png)
+![Mac Setup](screenshots/mac_setup.png)
+![Linux Setup](screenshots/linux_setup.png)
+
+For more screenshots, check the [screenshots directory](screenshots/).
+
+</details>
 
 ## Features
 
@@ -122,6 +143,13 @@ The web interface will be available at http://127.0.0.1:7860/
    - **Conservation Analysis**: Table of conserved regions
    - **Export Options**: Export aligned sequences in various formats
 
+<details>
+<summary>See screenshot of user interface</summary>
+
+![Muscle5 Application Interface](screenshots/app_screenshot.png)
+
+</details>
+
 ### Advanced Usage
 
 #### Command-line Options
@@ -182,6 +210,21 @@ If you encounter issues not covered in the troubleshooting section, please:
 3. Contact the developer using the information in the Contact section
 
 ## Deployment
+
+### Run in GitHub Codespaces (No Installation Required!)
+
+You can run this application directly in your browser using GitHub Codespaces without installing anything locally:
+
+1. Click the green "Code" button at the top of this repository
+2. Select the "Codespaces" tab
+3. Click "Create codespace on main"
+4. Once the environment loads, run:
+   ```bash
+   python app.py
+   ```
+5. Click the "Open in Browser" notification when the Gradio interface starts
+
+For detailed instructions, see the [GitHub Codespaces Guide](GITHUB_CODESPACES.md).
 
 ### Publishing to GitHub
 
