@@ -1012,6 +1012,26 @@ def create_ui():
             outputs=[text_output, plot_output, conservation_table, alignment_state, region_end]
         )
         
+    # Add Codespaces info box if running in Codespaces
+    if is_codespaces():
+        with gr.Blocks() as app:
+            with gr.Row():
+                with gr.Column(scale=1):
+                    gr.Markdown("### 🌩️ GitHub Codespaces Environment")
+                    gr.Markdown("""
+                    **You're running in GitHub Codespaces!**
+                    
+                    - Session will timeout after 30 minutes of inactivity
+                    - For large datasets, consider downloading and running locally
+                    - Use the share button to get a temporary public URL
+                    """)
+                with gr.Column(scale=3):
+                    # Insert main interface components
+                    pass
+    else:
+        # Regular interface for non-Codespaces environments
+        pass
+    
     return app
 
 if __name__ == "__main__":
